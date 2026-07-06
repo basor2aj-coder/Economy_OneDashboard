@@ -96,6 +96,41 @@ cpi_df["CPI_YOY"] = cpi_df["CPI_INDEX"].pct_change(periods=12) * 100
 for df in [gdp_df, unemp_df, fed_df]:
     df["DATE"] = pd.to_datetime(df["DATE"])
 
+# --- Data quality validation ---
+warnings = []
+
+# Check for empty datasets
+if gdp_df.empty:
+    warnings.append("GDP data returned no rows.")
+if unemp_df.empty:
+    warnings.append("Unemployment data returned no rows.")
+if fed_df.empty:
+    warnings.append("Federal Funds Rate data returned no rows.")
+if cpi_df.empty or cpi_df["CPI_YOY"].dropna().empty:
+    warnings.append("CPI data returned no rows or insufficient history for YoY calculation.")
+
+# Check for stale data (last observation older than 120 days)
+stale_threshold = pd.Timestamp.now() - pd.Timedelta(days=120)
+if not gdp_df.empty and gdp_df["DATE"].max() < stale_threshold:
+    warnings.append(f"GDP data may be stale (last: {gdp_df['DATE'].max().strftime('%b %Y')}).")
+if not unemp_df.empty and unemp_df["DATE"].max() < stale_threshold:
+    warnings.append(f"Unemployment data may be stale (last: {unemp_df['DATE'].max().strftime('%b %Y')}).")
+if not fed_df.empty and fed_df["DATE"].max() < stale_threshold:
+    warnings.append(f"Fed Funds data may be stale (last: {fed_df['DATE'].max().strftime('%b %Y')}).")
+
+# Check for anomalous values
+if not unemp_df.empty and (unemp_df["UNEMPLOYMENT_RATE"].max() > 30 or unemp_df["UNEMPLOYMENT_RATE"].min() < 0):
+    warnings.append("Unemployment rate contains values outside expected range (0–30%).")
+if not fed_df.empty and (fed_df["FED_FUNDS_RATE"].max() > 25 or fed_df["FED_FUNDS_RATE"].min() < 0):
+    warnings.append("Fed Funds Rate contains values outside expected range (0–25%).")
+if not cpi_df["CPI_YOY"].dropna().empty and cpi_df["CPI_YOY"].abs().max() > 20:
+    warnings.append("CPI YoY inflation exceeds 20% — verify data integrity.")
+
+if warnings:
+    with st.expander(f"⚠️ Data quality ({len(warnings)} warning{'s' if len(warnings) > 1 else ''})", expanded=False):
+        for w in warnings:
+            st.warning(w)
+
 # --- Sidebar ---
 with st.sidebar:
     st.header("⚙️ Controls")
