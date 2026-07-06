@@ -5,6 +5,7 @@ A real-time U.S. macroeconomic dashboard built with **Streamlit in Snowflake**, 
 ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)
 ![Snowflake](https://img.shields.io/badge/Snowflake-29B5E8?logo=snowflake&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![Tests](https://github.com/basor2aj-coder/Economy_OneDashboard/actions/workflows/tests.yml/badge.svg)
 
 ![Dashboard Screenshot](screenshot.png)
 

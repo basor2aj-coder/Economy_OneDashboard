@@ -8,4 +8,5 @@ entities:
     artifacts:
       - pyproject.toml
       - streamlit_app.py
+      - data_quality_checks.py
       - .streamlit/config.toml
