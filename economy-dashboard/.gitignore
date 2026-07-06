@@ -8,6 +8,10 @@ __pycache__/
 .venv/
 venv/
 
+# Test caches
+.pytest_cache/
+pytest-cache-files-*/
+
 # OS
 .DS_Store
 Thumbs.db
