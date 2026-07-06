@@ -128,7 +128,7 @@ with st.sidebar:
     st.divider()
     loaded_at = st.session_state.get("data_loaded_at")
     if loaded_at:
-        st.caption(f"Data loaded: {loaded_at.strftime('%b %d, %Y %I:%M %p')}")
+        st.caption(f"Data loaded: {loaded_at.strftime('%b %d, %Y %I:%M %p')} UTC")
 
 # --- Filter data by selected range ---
 gdp_filt = gdp_df[(gdp_df["DATE"] >= start_date) & (gdp_df["DATE"] <= end_date)]
