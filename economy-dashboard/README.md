@@ -22,11 +22,14 @@ This dashboard visualizes four key U.S. economic indicators on a shared timeline
 
 ## Features
 
-- **KPI cards** showing latest values with period-over-period deltas
-- **Combined time-series chart** with all indicators overlaid
-- **Detailed panel views** (bar, area, line charts) for each indicator
-- **Interactive controls** — date range slider, indicator toggles
-- **Cached queries** with manual refresh button for snappy interactions
+- **KPI cards** showing latest values with period-over-period deltas and contextual help tooltips
+- **Combined Altair chart** with dual y-axes — GDP as bars (right axis), rates as lines (left axis)
+- **NBER recession shading** — grey vertical bands marking the 2001, 2007–2009, and 2020 recessions
+- **Detailed panel views** — individual bar, area, and line charts with hover tooltips for each indicator
+- **Interactive controls** — date range slider, indicator toggles, manual cache refresh
+- **Dark/light theme** — auto-switches based on system preference via `.streamlit/config.toml`
+- **Error handling** — friendly message with marketplace link if the dataset isn't installed
+- **No external dependencies** — uses only Altair and Pandas (pre-installed in the Streamlit runtime)
 
 ## Architecture
 
@@ -52,6 +55,8 @@ This dashboard visualizes four key U.S. economic indicators on a shared timeline
 - Queries live data directly from Snowflake's shared data layer — no pipelines, no staging tables
 - Computes CPI year-over-year inflation on the fly from the raw index
 - Uses `@st.cache_data` with 1-hour TTL to balance freshness and performance
+- Altair for visualization (pre-installed, no EAI needed) with `resolve_scale(y="independent")` for dual axes
+- Graceful degradation — try/except with user-friendly error if marketplace data is unavailable
 
 ## Prerequisites
 
@@ -99,7 +104,8 @@ economy-dashboard/
 
 - **Cloud data engineering** — querying live government datasets via Snowflake Marketplace data sharing (zero ETL)
 - **Full-stack data application** — SQL, Python data transformation, and interactive UI in one project
-- **Production patterns** — cache management, parameterized filtering, responsive layout
+- **Data visualization** — dual-axis charts, recession band overlays, consistent color system, dark/light theme adaptation
+- **Production patterns** — error handling, cache management, parameterized filtering, responsive layout
 - **Domain knowledge** — joining datasets across different temporal granularities (quarterly GDP vs. monthly CPI/unemployment)
 
 ## Data Sources

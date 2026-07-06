@@ -1,6 +1,7 @@
 # Economy in One Dashboard — multi-indicator macroeconomic visualization
 # Co-authored with CoCo
 import os
+from datetime import datetime
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -15,7 +16,7 @@ conn = st.connection("snowflake", ttl=os.getenv("SNOWFLAKE_CONNECTION_TTL"))
 COLORS = {
     "GDP": "#1f77b4",
     "CPI": "#d62728",
-    "UNEMP": "#555555",
+    "UNEMP": "#9e9e9e",
     "FED": "#2ca02c",
 }
 
@@ -69,11 +70,23 @@ def load_cpi():
 
 
 # --- Load data ---
-with st.spinner("Loading economic data..."):
-    gdp_df = load_gdp()
-    unemp_df = load_unemployment()
-    fed_df = load_fed_funds()
-    cpi_df = load_cpi()
+try:
+    with st.spinner("Loading economic data..."):
+        gdp_df = load_gdp()
+        unemp_df = load_unemployment()
+        fed_df = load_fed_funds()
+        cpi_df = load_cpi()
+        if "data_loaded_at" not in st.session_state:
+            st.session_state.data_loaded_at = datetime.now()
+except Exception as e:
+    st.error(
+        "**Failed to load economic data.** "
+        "Make sure the [Snowflake Public Data (Free)](https://app.snowflake.com/marketplace/listing/GZTSZ290BV255) "
+        "listing is installed in your Snowflake account and your role has access to the "
+        "`SNOWFLAKE_PUBLIC_DATA_FREE` database."
+    )
+    st.exception(e)
+    st.stop()
 
 # Compute CPI YoY inflation rate
 cpi_df["DATE"] = pd.to_datetime(cpi_df["DATE"])
@@ -109,7 +122,13 @@ with st.sidebar:
         load_unemployment.clear()
         load_fed_funds.clear()
         load_cpi.clear()
+        st.session_state.data_loaded_at = datetime.now()
         st.rerun()
+
+    st.divider()
+    loaded_at = st.session_state.get("data_loaded_at")
+    if loaded_at:
+        st.caption(f"Data loaded: {loaded_at.strftime('%b %d, %Y %I:%M %p')}")
 
 # --- Filter data by selected range ---
 gdp_filt = gdp_df[(gdp_df["DATE"] >= start_date) & (gdp_df["DATE"] <= end_date)]
